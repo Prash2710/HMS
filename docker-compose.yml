@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./Backend_HMS/Hospital_MS
+    image: hms-backend
+    container_name: hms-backend
+    ports:
+      - '8081:8081'
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@host.docker.internal:1521/XE
+      - SPRING_DATASOURCE_USERNAME=hms
+      - SPRING_DATASOURCE_PASSWORD=hms
+    networks:
+      - hms-network
+
+  frontend:
+    build: ./Frontend_HMS/HMS
+    image: angular-frontend
+    container_name: angular-app
+    ports:
+      - '4200:80'
+    depends_on:
+      - backend
+    networks:
+      - hms-network
+
+networks:
+  hms-network:
+    driver: bridge

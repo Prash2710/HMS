@@ -1,0 +1,48 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'Frontend_HMS/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'Frontend_HMS/**'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: Frontend_HMS/HMS
+        run: npm install
+
+      - name: Build Angular app
+        working-directory: Frontend_HMS/HMS
+        run: npm run build --configuration=production
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Frontend Image
+        working-directory: Frontend_HMS/HMS
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/hms-frontend:latest .
+          docker push ghcr.io/${{ github.repository_owner }}/hms-frontend:latest

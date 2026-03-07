@@ -1,0 +1,29 @@
+# Eclipse
+.metadata/
+*.class
+*.jar
+*.war
+*.ear
+target/
+
+# Maven
+.mvn/
+!**/src/main/**
+!**/src/test/**
+
+# Node
+node_modules/
+dist/
+.angular/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.env

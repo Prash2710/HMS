@@ -3,13 +3,8 @@ name: Frontend CI/CD
 on:
   push:
     branches: [ main ]
-    workflow_dispatch:
-    paths:
-      - 'Frontend_HMS/**'
   pull_request:
     branches: [ main ]
-    paths:
-      - 'Frontend_HMS/**'
 
 jobs:
   build-and-push:
@@ -17,6 +12,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     steps:
       - name: Checkout code
@@ -36,15 +32,11 @@ jobs:
         run: npm run build --configuration=production
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: \${{ github.actor }}
-          password: \${{ secrets.GITHUB_TOKEN }}
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build and Push Frontend Image
         working-directory: Frontend_HMS/HMS
         run: |
-          OWNER=\$(echo \"\${{ github.repository_owner }}\" | tr '[:upper:]' '[:lower:]')
-          docker build -t ghcr.io/\${OWNER}/hms-frontend:latest .
-          docker push ghcr.io/\${OWNER}/hms-frontend:latest")
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          docker build -t ghcr.io/${OWNER}/hms-frontend:latest .
+          docker push ghcr.io/${OWNER}/hms-frontend:latest

@@ -1,0 +1,84 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo">🏥</div>
+      <h1>Hospital Management System</h1>
+      <h2>Welcome Back</h2>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          [value]="loginData().username"
+          (input)="updateUsername($any($event.target).value)"
+          required
+          class="form-control"
+          placeholder="Enter your username"
+          [disabled]="loading()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          [value]="loginData().password"
+          (input)="updatePassword($any($event.target).value)"
+          required
+          class="form-control"
+          placeholder="Enter your password"
+          [disabled]="loading()"
+        />
+      </div>
+
+      @if (errorMessage()) {
+        <div class="error-message">
+          <span class="error-icon">⚠️</span>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <button 
+        type="submit" 
+        class="btn btn-primary" 
+        [disabled]="!loginForm.valid || loading()"
+      >
+        @if (loading()) {
+          <span class="spinner"></span>
+          Logging in...
+        } @else {
+          Login
+        }
+      </button>
+    </form>
+
+    <div class="divider">
+      <span>OR</span>
+    </div>
+
+    <div class="register-link">
+      <p>Don't have an account? <a routerLink="/register">Register here</a></p>
+    </div>
+
+    <div class="demo-credentials">
+      <p class="demo-title">Demo Credentials:</p>
+      <div class="demo-grid">
+        <div class="demo-item">
+          <strong>Admin:</strong> admin / admin123
+        </div>
+        <div class="demo-item">
+          <strong>Doctor:</strong> doctor1 / doctor123
+        </div>
+        <div class="demo-item">
+          <strong>Patient:</strong> patient1 / patient123
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

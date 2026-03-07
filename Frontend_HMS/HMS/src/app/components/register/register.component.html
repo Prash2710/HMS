@@ -1,0 +1,153 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <div class="logo">🏥</div>
+      <h1>Create Account</h1>
+      <p>Join our healthcare community</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input 
+            type="text" 
+            id="firstName" 
+            name="firstName" 
+            [value]="registerData().firstName"
+            (input)="updateField('firstName', $any($event.target).value)"
+            required
+            class="form-control"
+            placeholder="John"
+            [disabled]="loading()"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input 
+            type="text" 
+            id="lastName" 
+            name="lastName" 
+            [value]="registerData().lastName"
+            (input)="updateField('lastName', $any($event.target).value)"
+            required
+            class="form-control"
+            placeholder="Doe"
+            [disabled]="loading()"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          [value]="registerData().username"
+          (input)="updateField('username', $any($event.target).value)"
+          required
+          minlength="3"
+          class="form-control"
+          placeholder="Choose a unique username"
+          [disabled]="loading()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          [value]="registerData().email"
+          (input)="updateField('email', $any($event.target).value)"
+          required
+          email
+          class="form-control"
+          placeholder="john.doe@example.com"
+          [disabled]="loading()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input 
+          type="tel" 
+          id="phone" 
+          name="phone" 
+          [value]="registerData().phone"
+          (input)="updateField('phone', $any($event.target).value)"
+          class="form-control"
+          placeholder="+1 (555) 123-4567"
+          [disabled]="loading()"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            [value]="registerData().password"
+            (input)="updateField('password', $any($event.target).value)"
+            required
+            minlength="6"
+            class="form-control"
+            placeholder="Min. 6 characters"
+            [disabled]="loading()"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input 
+            type="password" 
+            id="confirmPassword" 
+            name="confirmPassword" 
+            [value]="confirmPassword()"
+            (input)="confirmPassword.set($any($event.target).value)"
+            required
+            class="form-control"
+            placeholder="Re-enter password"
+            [disabled]="loading()"
+          />
+        </div>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="error-message">
+          <span class="error-icon">⚠️</span>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="success-message">
+          <span class="success-icon">✓</span>
+          {{ successMessage() }}
+        </div>
+      }
+
+      <button 
+        type="submit" 
+        class="btn btn-primary" 
+        [disabled]="!registerForm.valid || loading()"
+      >
+        @if (loading()) {
+          <span class="spinner"></span>
+          Creating Account...
+        } @else {
+          Create Account
+        }
+      </button>
+    </form>
+
+    <div class="login-link">
+      <p>Already have an account? <a routerLink="/login">Login here</a></p>
+    </div>
+  </div>
+</div>

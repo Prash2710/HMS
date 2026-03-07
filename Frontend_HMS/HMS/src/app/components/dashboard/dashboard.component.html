@@ -1,0 +1,215 @@
+<div class="dashboard-container">
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <span class="logo">🏥</span>
+      <h1>Hospital Management</h1>
+    </div>
+    <div class="navbar-menu">
+      <span class="user-info">
+        <span class="user-icon">👤</span>
+        {{ currentUser()?.username }}
+      </span>
+      <button class="btn btn-logout" (click)="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="dashboard-content">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <ul class="menu">
+        <li routerLinkActive="active">
+          <a routerLink="/dashboard">
+            <span class="menu-icon">📊</span>
+            Dashboard
+          </a>
+        </li>
+        
+        @if (isPatient()) {
+          <li routerLinkActive="active">
+            <a routerLink="/patient/appointments">
+              <span class="menu-icon">📅</span>
+              My Appointments
+            </a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/patient/book-appointment">
+              <span class="menu-icon">➕</span>
+              Book Appointment
+            </a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/patient/profile">
+              <span class="menu-icon">👤</span>
+              My Profile
+            </a>
+          </li>
+        }
+        
+        @if (isDoctor()) {
+          <li routerLinkActive="active">
+            <a routerLink="/doctor/appointments">
+              <span class="menu-icon">📅</span>
+              My Schedule
+            </a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/doctor/patients">
+              <span class="menu-icon">👥</span>
+              My Patients
+            </a>
+          </li>
+        }
+        
+        @if (isAdmin()) {
+          <li routerLinkActive="active">
+            <a routerLink="/admin/patients">
+              <span class="menu-icon">👥</span>
+              Manage Patients
+            </a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/admin/doctors">
+              <span class="menu-icon">👨‍⚕️</span>
+              Manage Doctors
+            </a>
+          </li>
+          <li routerLinkActive="active">
+            <a routerLink="/admin/appointments">
+              <span class="menu-icon">📋</span>
+              All Appointments
+            </a>
+          </li>
+        }
+        
+        <li routerLinkActive="active">
+          <a routerLink="/doctors">
+            <span class="menu-icon">🔍</span>
+            View Doctors
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="dashboard-header">
+        <h2>Welcome back, {{ currentUser()?.username }}! 👋</h2>
+        <p class="subtitle">Here's what's happening today</p>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon doctor">👨‍⚕️</div>
+          <div class="stat-info">
+            <h3>{{ availableDoctorsCount() }}</h3>
+            <p>Available Doctors</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon appointment">📅</div>
+          <div class="stat-info">
+            <h3>{{ upcomingAppointmentsCount() }}</h3>
+            <p>Upcoming Appointments</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon status">✅</div>
+          <div class="stat-info">
+            <h3>Active</h3>
+            <p>System Status</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Available Doctors Section -->
+      <div class="section">
+        <div class="section-header">
+          <h3>Available Doctors</h3>
+          <a routerLink="/doctors" class="view-all">View All →</a>
+        </div>
+
+        @if (loading()) {
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading doctors...</p>
+          </div>
+        } @else {
+          <div class="doctors-grid">
+            @for (doctor of doctors(); track doctor.id) {
+              <div class="doctor-card">
+                <div class="doctor-avatar">👨‍⚕️</div>
+                <h4>Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h4>
+                <p class="specialization">{{ doctor.specialization }}</p>
+                <div class="doctor-details">
+                  <span class="experience">📚 {{ doctor.experience }} years</span>
+                  <span class="fee">💰 ${{ doctor.consultationFee }}</span>
+                </div>
+                @if (isPatient()) {
+                  <button class="btn btn-primary btn-sm" (click)="navigateToBooking(doctor.id!)">
+                    Book Now
+                  </button>
+                }
+              </div>
+            } @empty {
+              <p class="no-data">No doctors available</p>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Recent Appointments Section -->
+      <div class="section">
+        <div class="section-header">
+          <h3>Recent Appointments</h3>
+          @if (isPatient()) {
+            <a routerLink="/patient/appointments" class="view-all">View All →</a>
+          }
+        </div>
+
+        @if (loading()) {
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading appointments...</p>
+          </div>
+        } @else {
+          <div class="appointments-list">
+            @for (appointment of appointments(); track appointment.id) {
+              <div class="appointment-item">
+                <div class="appointment-left">
+                  <div class="appointment-icon">🏥</div>
+                  <div class="appointment-info">
+                    <h4>{{ appointment.doctorName }}</h4>
+                    <p class="appointment-specialty">{{ appointment.doctorSpecialization }}</p>
+                    <p class="appointment-date">
+                      📅 {{ appointment.appointmentDateTime | date:'medium' }}
+                    </p>
+                  </div>
+                </div>
+                <span class="status-badge" [ngClass]="getStatusClass(appointment.status)">
+                  {{ appointment.status }}
+                </span>
+              </div>
+            } @empty {
+              <div class="no-data">
+                <span class="empty-icon">📭</span>
+                <p>No appointments found</p>
+                @if (isPatient()) {
+                  <button class="btn btn-primary" routerLink="/patient/book-appointment">
+                    Book Your First Appointment
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Router Outlet for nested routes -->
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

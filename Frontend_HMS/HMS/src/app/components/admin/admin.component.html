@@ -1,0 +1,100 @@
+<div class="dashboard-container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>HMS Admin</h2>
+    </div>
+
+    <nav>
+      <ul>
+        <li class="active"><i class="icon">🏥</i> Dashboard</li>
+        <li><i class="icon">👨‍⚕️</i> Doctors</li>
+        <li><i class="icon">🧑‍🤝‍🧑</i> Patients</li>
+        <li><i class="icon">📅</i> Appointments</li>
+        <li><i class="icon">💊</i> Pharmacy</li>
+        <li><i class="icon">🧾</i> Billing</li>
+        <li><i class="icon">⚙️</i> Settings</li>
+        <li><button class="logout-btn" (click)="logout()">
+  Logout
+</button></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <header class="topbar">
+      <h1>Admin Dashboard</h1>
+      <div class="admin-profile">
+        <span>Welcome, Admin</span>
+        <img src="https://i.pravatar.cc/40" alt="admin" />
+      </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <section class="stats">
+      <div class="card">
+        <h3>Total Doctors</h3>
+        <p>42</p>
+      </div>
+
+      <div class="card">
+        <h3>Total Patients</h3>
+        <p>1,280</p>
+      </div>
+
+      <div class="card">
+        <h3>Appointments Today</h3>
+        <p>96</p>
+      </div>
+
+      <div class="card">
+        <h3>Revenue</h3>
+        <p>₹3,45,000</p>
+      </div>
+    </section>
+
+    <!-- Recent Appointments -->
+    <section class="appointments">
+      <h2>Recent Appointments</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Rahul Sharma</td>
+            <td>Dr. Mehta</td>
+            <td>05 Feb 2026</td>
+            <td><span class="status completed">Completed</span></td>
+          </tr>
+
+          <tr>
+            <td>Priya Singh</td>
+            <td>Dr. Kapoor</td>
+            <td>05 Feb 2026</td>
+            <td><span class="status pending">Pending</span></td>
+          </tr>
+
+          <tr>
+            <td>Amit Verma</td>
+            <td>Dr. Joshi</td>
+            <td>06 Feb 2026</td>
+            <td><span class="status scheduled">Scheduled</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</div>

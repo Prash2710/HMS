@@ -38,12 +38,12 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: \${{ github.actor }}
+          password: \${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Frontend Image
         working-directory: Frontend_HMS/HMS
         run: |
-          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          docker build -t ghcr.io/${OWNER}/hms-frontend:latest .
-          docker push ghcr.io/${OWNER}/hms-frontend:latest
+          OWNER=\$(echo \"\${{ github.repository_owner }}\" | tr '[:upper:]' '[:lower:]')
+          docker build -t ghcr.io/\${OWNER}/hms-frontend:latest .
+          docker push ghcr.io/\${OWNER}/hms-frontend:latest")

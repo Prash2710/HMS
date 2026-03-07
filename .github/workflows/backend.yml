@@ -41,5 +41,6 @@ jobs:
       - name: Build and Push Backend Image
         working-directory: Backend_HMS/Hospital_MS
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/hms-backend:latest .
-          docker push ghcr.io/${{ github.repository_owner }}/hms-backend:latest
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          docker build -t ghcr.io/${OWNER}/hms-backend:latest .
+          docker push ghcr.io/${OWNER}/hms-backend:latest

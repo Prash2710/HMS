@@ -72,9 +72,6 @@
     <version>1.7.0</version>
 </dependency>
 
-
-
-        <!-- JWT -->
         <!-- JJWT API -->
 <dependency>
     <groupId>io.jsonwebtoken</groupId>

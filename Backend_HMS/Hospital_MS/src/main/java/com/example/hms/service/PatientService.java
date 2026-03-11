@@ -3,6 +3,8 @@ package com.example.hms.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,8 +27,9 @@ public class PatientService {
         this.userRepository = userRepository;
     }
 
+    // 🔴 Clears all patient cache when new patient is created
+    @CacheEvict(value = {"patients", "patient"}, allEntries = true)
     public PatientDTO createPatient(CreatePatientRequest request) {
-
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -48,8 +51,9 @@ public class PatientService {
         return convertToDTO(savedPatient);
     }
 
+    // 🔴 Clears cache for this specific patient and all patients list
+    @CacheEvict(value = {"patients", "patient"}, allEntries = true)
     public PatientDTO updatePatient(Long id, CreatePatientRequest request) {
-
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
 
@@ -69,42 +73,42 @@ public class PatientService {
         return convertToDTO(updatedPatient);
     }
 
+    // 🟢 Cache single patient by ID — key = "patient::1", "patient::2" etc
+    @Cacheable(value = "patient", key = "#id")
     @Transactional(readOnly = true)
     public PatientDTO getPatientById(Long id) {
-
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
-
         return convertToDTO(patient);
     }
 
+    // 🟢 Cache patient by userId
+    @Cacheable(value = "patient", key = "'user_' + #userId")
     @Transactional(readOnly = true)
     public PatientDTO getPatientByUserId(Long userId) {
-
         Patient patient = patientRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
-
         return convertToDTO(patient);
     }
 
+    // 🟢 Cache all patients list — most impactful cache
+    @Cacheable(value = "patients")
     @Transactional(readOnly = true)
     public List<PatientDTO> getAllPatients() {
-
         return patientRepository.findAll()
                 .stream()
                 .map(this::convertToDTO)
-                .collect(Collectors.toList()); // Java 8
+                .collect(Collectors.toList());
     }
 
+    // 🔴 Clears cache when patient is deleted
+    @CacheEvict(value = {"patients", "patient"}, allEntries = true)
     public void deletePatient(Long id) {
         patientRepository.deleteById(id);
     }
 
-    // DTO conversion using setters (not records)
     private PatientDTO convertToDTO(Patient patient) {
-
         PatientDTO dto = new PatientDTO();
-
         dto.setId(patient.getId());
         dto.setUserId(patient.getUser().getId());
         dto.setFirstName(patient.getUser().getFirstName());
@@ -123,8 +127,6 @@ public class PatientService {
         dto.setEmergencyContactName(patient.getEmergencyContactName());
         dto.setEmergencyContactPhone(patient.getEmergencyContactPhone());
         dto.setCreatedAt(patient.getCreatedAt());
-
         return dto;
     }
 }
-	

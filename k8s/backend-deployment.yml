@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hms-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hms-backend
+  template:
+    metadata:
+      labels:
+        app: hms-backend
+    spec:
+      containers:
+      - name: hms-backend
+        image: ghcr.io/prash2710/hms-backend:latest
+        ports:
+        - containerPort: 8081
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:mysql://hms-db.c76cgaiiy6sz.eu-north-1.rds.amazonaws.com:3306/hmsdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "admin"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "hms123456"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hms-backend-service
+spec:
+  selector:
+    app: hms-backend
+  ports:
+  - port: 8081
+    targetPort: 8081
+  type: NodePort

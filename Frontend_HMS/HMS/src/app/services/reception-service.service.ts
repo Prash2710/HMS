@@ -4,7 +4,8 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({ providedIn: 'root' })
 export class ReceptionService {
   private http = inject(HttpClient);
-  private API = 'http://localhost:8082/api/reception';
+  
+  private API = '/api/reception';  //for production
 
   getPatients(page = 0, size = 5) {
     return this.http.get<any>(`${this.API}/patients?page=${page}&size=${size}`);

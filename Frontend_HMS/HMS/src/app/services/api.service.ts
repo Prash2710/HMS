@@ -5,7 +5,7 @@ import { ApiResponse, PageResponse, DoctorDTO, CreateDoctorRequest, Receptionist
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  //private BASE = 'http://localhost:8082/api';
+  
   private BASE = '/api';  //for production
   constructor(private http: HttpClient) {}
 

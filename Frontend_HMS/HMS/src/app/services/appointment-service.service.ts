@@ -4,7 +4,8 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({ providedIn: 'root' })
 export class AppointmentService {
   private http = inject(HttpClient);
-  private API = 'http://localhost:8082/appointments';
+  
+  private API = '/api/appointments';  //for production
 
   getAll() {
     return this.http.get<any>(this.API);

@@ -7,7 +7,8 @@ import type { LoginRequest } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly API = 'http://localhost:8082/api/auth';
+  
+  private API = '/api/auth';  //for production
   private subject = new BehaviorSubject<AuthResponse | null>(this.storedUser());
   currentUser$ = this.subject.asObservable();
 

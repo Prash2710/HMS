@@ -3,17 +3,17 @@ package com.example.hms.dto;
 import java.time.LocalDateTime;
 
 public class CreateAppointmentRequest {
-	private Long patientI;
+	private Long patientId;
     private Long doctorId;
     private LocalDateTime appointmentDateTime;
     private String status;
     private String reason;
     private String notes;
-	public Long getPatientI() {
-		return patientI;
+	public Long getPatientId() {
+		return patientId;
 	}
-	public void setPatientI(Long patientI) {
-		this.patientI = patientI;
+	public void setPatientId(Long patientId) {
+		this.patientId = patientId;
 	}
 	public Long getDoctorId() {
 		return doctorId;
@@ -45,6 +45,5 @@ public class CreateAppointmentRequest {
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
-    
     
 }

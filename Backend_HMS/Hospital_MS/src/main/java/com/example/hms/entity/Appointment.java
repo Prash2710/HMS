@@ -1,18 +1,24 @@
 package com.example.hms.entity;
 
 import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Entity
-@Table(name = "APPOINTMENTS")
+@Table(
+    name = "APPOINTMENTS",
+    indexes = {
+        @Index(name = "idx_appointment_doctor", columnList = "DOCTOR_ID"),
+        @Index(name = "idx_appointment_patient", columnList = "PATIENT_ID"),
+        @Index(name = "idx_appointment_datetime", columnList = "APPOINTMENT_DATETIME")
+    }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Appointment {
 
     @Id
@@ -25,30 +31,30 @@ public class Appointment {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id", nullable = false)
+    @JoinColumn(name = "PATIENT_ID", nullable = false)
     private Patient patient;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "doctor_id", nullable = false)
+    @JoinColumn(name = "DOCTOR_ID", nullable = false)
     private Doctor doctor;
 
-    @Column(nullable = false)
+    @Column(name = "APPOINTMENT_DATETIME", nullable = false)
     private LocalDateTime appointmentDateTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "STATUS", nullable = false)
     private Status status = Status.SCHEDULED;
 
-    @Column(length = 1000)
+    @Column(name = "REASON", length = 1000)
     private String reason;
 
-    @Column(length = 1000)
+    @Column(name = "NOTES", length = 1000)
     private String notes;
 
-    @Column(name = "created_at")
+    @Column(name = "CREATED_AT", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
     @PrePersist
@@ -62,7 +68,6 @@ public class Appointment {
         updatedAt = LocalDateTime.now();
     }
 
-    // Utility methods (safe)
     public String getFormattedDateTime() {
         DateTimeFormatter formatter =
                 DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' hh:mm a");
@@ -75,7 +80,7 @@ public class Appointment {
 
     public boolean isUpcoming() {
         return appointmentDateTime.isAfter(LocalDateTime.now()) &&
-               (status == Status.SCHEDULED || status == Status.CONFIRMED);
+                (status == Status.SCHEDULED || status == Status.CONFIRMED);
     }
 
     public enum Status {
@@ -85,4 +90,78 @@ public class Appointment {
         CANCELLED,
         NO_SHOW
     }
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Patient getPatient() {
+		return patient;
+	}
+
+	public void setPatient(Patient patient) {
+		this.patient = patient;
+	}
+
+	public Doctor getDoctor() {
+		return doctor;
+	}
+
+	public void setDoctor(Doctor doctor) {
+		this.doctor = doctor;
+	}
+
+	public LocalDateTime getAppointmentDateTime() {
+		return appointmentDateTime;
+	}
+
+	public void setAppointmentDateTime(LocalDateTime appointmentDateTime) {
+		this.appointmentDateTime = appointmentDateTime;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+    
+    
 }

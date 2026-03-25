@@ -1,0 +1,68 @@
+.page {
+  padding: 20px;
+  background: #f1f5f9;
+  min-height: 100vh;
+  font-family: 'Segoe UI';
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.book-btn {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.booking-box {
+  background: white;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+
+/* Table */
+table {
+  width: 100%;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th {
+  background: #e2e8f0;
+  padding: 10px;
+  text-align: left;
+}
+
+td {
+  padding: 10px;
+  border-top: 1px solid #eee;
+}
+
+/* Status */
+.badge {
+  padding: 4px 10px;
+  border-radius: 10px;
+  color: white;
+}
+
+.green { background: #16a34a; }
+.blue { background: #3b82f6; }
+.red { background: #ef4444; }
+
+.loading {
+  text-align: center;
+  padding: 20px;
+}
+
+.empty {
+  text-align: center;
+  padding: 20px;
+}

@@ -32,11 +32,11 @@ public class CustomUserDetailsService implements UserDetailsService {
                         "User not found: " + username));
 
         List<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> (GrantedAuthority)
-                        new SimpleGrantedAuthority(role.getName().name()))
+                .map(role ->
+                        new SimpleGrantedAuthority("ROLE_" + role.getName().name())
+                )
                 .collect(Collectors.toList());
 
         return UserDetailsImpl.build(user, authorities);
     }
-
 }

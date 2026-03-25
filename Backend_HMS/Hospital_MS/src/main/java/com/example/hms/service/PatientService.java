@@ -1,19 +1,14 @@
 package com.example.hms.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.example.hms.dto.CreatePatientRequest;
-import com.example.hms.dto.PatientDTO;
-import com.example.hms.entity.Patient;
-import com.example.hms.entity.User;
-import com.example.hms.repository.PatientRepository;
-import com.example.hms.repository.UserRepository;
+import com.example.hms.dto.*;
+import com.example.hms.entity.*;
+import com.example.hms.entity.Role.RoleName;
+import com.example.hms.repository.*;
 
 @Service
 @Transactional
@@ -21,108 +16,85 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public PatientService(PatientRepository patientRepository, UserRepository userRepository) {
-        this.patientRepository = patientRepository;
-        this.userRepository = userRepository;
+    public PatientService(PatientRepository patientRepository, UserRepository userRepository,
+                          RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+        this.patientRepository = patientRepository; this.userRepository = userRepository;
+        this.roleRepository = roleRepository; this.passwordEncoder = passwordEncoder;
     }
 
-    // 🔴 Clears all patient cache when new patient is created
-    @CacheEvict(value = {"patients", "patient"}, allEntries = true)
     public PatientDTO createPatient(CreatePatientRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+        if (userRepository.existsByUsername(request.getUsername()))
+            throw new RuntimeException("Username already taken: " + request.getUsername());
+        if (userRepository.existsByEmail(request.getEmail()))
+            throw new RuntimeException("Email already in use: " + request.getEmail());
+        User user = new User();
+        user.setUsername(request.getUsername()); user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setFirstName(request.getFirstName()); user.setLastName(request.getLastName());
+        user.setPhone(request.getPhone());
+        user.addRole(roleRepository.findByName(RoleName.PATIENT).orElseThrow(() -> new RuntimeException("PATIENT role not found")));
+        user = userRepository.save(user);
         Patient patient = new Patient();
         patient.setUser(user);
         patient.setDateOfBirth(request.getDateOfBirth());
-        patient.setGender(Patient.Gender.valueOf(request.getGender()));
-        patient.setAddress(request.getAddress());
-        patient.setCity(request.getCity());
-        patient.setState(request.getState());
-        patient.setZipCode(request.getZipCode());
-        patient.setBloodGroup(request.getBloodGroup());
-        patient.setMedicalHistory(request.getMedicalHistory());
+        patient.setGender(Patient.Gender.valueOf(request.getGender().toUpperCase()));
+        patient.setAddress(request.getAddress()); patient.setCity(request.getCity());
+        patient.setState(request.getState()); patient.setZipCode(request.getZipCode());
+        patient.setBloodGroup(request.getBloodGroup()); patient.setMedicalHistory(request.getMedicalHistory());
         patient.setAllergies(request.getAllergies());
         patient.setEmergencyContactName(request.getEmergencyContactName());
         patient.setEmergencyContactPhone(request.getEmergencyContactPhone());
-
-        Patient savedPatient = patientRepository.save(patient);
-        return convertToDTO(savedPatient);
+        return convertToDTO(patientRepository.save(patient));
     }
 
-    // 🔴 Clears cache for this specific patient and all patients list
-    @CacheEvict(value = {"patients", "patient"}, allEntries = true)
     public PatientDTO updatePatient(Long id, CreatePatientRequest request) {
-        Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient not found"));
-
+        Patient patient = patientRepository.findById(id).orElseThrow(() -> new RuntimeException("Patient not found"));
         patient.setDateOfBirth(request.getDateOfBirth());
-        patient.setGender(Patient.Gender.valueOf(request.getGender()));
-        patient.setAddress(request.getAddress());
-        patient.setCity(request.getCity());
-        patient.setState(request.getState());
-        patient.setZipCode(request.getZipCode());
-        patient.setBloodGroup(request.getBloodGroup());
-        patient.setMedicalHistory(request.getMedicalHistory());
+        patient.setGender(Patient.Gender.valueOf(request.getGender().toUpperCase()));
+        patient.setAddress(request.getAddress()); patient.setCity(request.getCity());
+        patient.setState(request.getState()); patient.setZipCode(request.getZipCode());
+        patient.setBloodGroup(request.getBloodGroup()); patient.setMedicalHistory(request.getMedicalHistory());
         patient.setAllergies(request.getAllergies());
         patient.setEmergencyContactName(request.getEmergencyContactName());
         patient.setEmergencyContactPhone(request.getEmergencyContactPhone());
-
-        Patient updatedPatient = patientRepository.save(patient);
-        return convertToDTO(updatedPatient);
+        return convertToDTO(patientRepository.save(patient));
     }
 
-    // 🟢 Cache single patient by ID — key = "patient::1", "patient::2" etc
-    @Cacheable(value = "patient", key = "#id")
     @Transactional(readOnly = true)
     public PatientDTO getPatientById(Long id) {
-        Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient not found"));
-        return convertToDTO(patient);
+        return convertToDTO(patientRepository.findById(id).orElseThrow(() -> new RuntimeException("Patient not found")));
     }
 
-    // 🟢 Cache patient by userId
-    @Cacheable(value = "patient", key = "'user_' + #userId")
     @Transactional(readOnly = true)
     public PatientDTO getPatientByUserId(Long userId) {
-        Patient patient = patientRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Patient not found"));
-        return convertToDTO(patient);
+        return convertToDTO(patientRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("Patient not found")));
     }
 
-    // 🟢 Cache all patients list — most impactful cache
-    @Cacheable(value = "patients")
     @Transactional(readOnly = true)
-    public List<PatientDTO> getAllPatients() {
-        return patientRepository.findAll()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+    public Page<PatientDTO> getAllPatients(Pageable pageable) {
+        return patientRepository.findAll(pageable).map(this::convertToDTO);
     }
 
-    // 🔴 Clears cache when patient is deleted
-    @CacheEvict(value = {"patients", "patient"}, allEntries = true)
     public void deletePatient(Long id) {
-        patientRepository.deleteById(id);
+        Patient patient = patientRepository.findById(id).orElseThrow(() -> new RuntimeException("Patient not found with id: " + id));
+        User user = patient.getUser();
+        patientRepository.delete(patient);
+        userRepository.delete(user);
     }
 
     private PatientDTO convertToDTO(Patient patient) {
         PatientDTO dto = new PatientDTO();
-        dto.setId(patient.getId());
-        dto.setUserId(patient.getUser().getId());
-        dto.setFirstName(patient.getUser().getFirstName());
-        dto.setLastName(patient.getUser().getLastName());
-        dto.setEmail(patient.getUser().getEmail());
-        dto.setPhone(patient.getUser().getPhone());
+        dto.setId(patient.getId()); dto.setUserId(patient.getUser().getId());
+        dto.setFirstName(patient.getUser().getFirstName()); dto.setLastName(patient.getUser().getLastName());
+        dto.setEmail(patient.getUser().getEmail()); dto.setPhone(patient.getUser().getPhone());
         dto.setDateOfBirth(patient.getDateOfBirth());
-        dto.setGender(patient.getGender().name());
-        dto.setAddress(patient.getAddress());
-        dto.setCity(patient.getCity());
-        dto.setState(patient.getState());
-        dto.setZipCode(patient.getZipCode());
-        dto.setBloodGroup(patient.getBloodGroup());
-        dto.setMedicalHistory(patient.getMedicalHistory());
+        dto.setGender(patient.getGender() != null ? patient.getGender().name() : null);
+        dto.setAddress(patient.getAddress()); dto.setCity(patient.getCity());
+        dto.setState(patient.getState()); dto.setZipCode(patient.getZipCode());
+        dto.setBloodGroup(patient.getBloodGroup()); dto.setMedicalHistory(patient.getMedicalHistory());
         dto.setAllergies(patient.getAllergies());
         dto.setEmergencyContactName(patient.getEmergencyContactName());
         dto.setEmergencyContactPhone(patient.getEmergencyContactPhone());

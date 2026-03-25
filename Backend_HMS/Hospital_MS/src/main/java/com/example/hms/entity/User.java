@@ -1,10 +1,7 @@
 package com.example.hms.entity;
 
-
 import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -12,61 +9,76 @@ import java.util.Set;
 
 @Entity
 @Table(name = "USERS")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
 
-	@Id
+    @Id
     @GeneratedValue(
-        strategy = GenerationType.SEQUENCE,
-        generator = "USER_SEQ_GEN"
+            strategy = GenerationType.SEQUENCE,
+            generator = "USER_SEQ_GEN"
     )
     @SequenceGenerator(
-        name = "USER_SEQ_GEN",
-        sequenceName = "USER_SEQ",
-        allocationSize = 1
+            name = "USER_SEQ_GEN",
+            sequenceName = "USER_SEQ",
+            allocationSize = 1
     )
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "USERNAME", unique = true, nullable = false)
     private String username;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "EMAIL", unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "PASSWORD", nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(name = "FIRST_NAME", nullable = false)
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(name = "LAST_NAME", nullable = false)
     private String lastName;
 
+    @Column(name = "PHONE")
     private String phone;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "user_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
+            name = "USER_ROLES",
+            joinColumns = @JoinColumn(name = "USER_ID"),
+            inverseJoinColumns = @JoinColumn(name = "ROLE_ID")
     )
     private Set<Role> roles = new HashSet<>();
 
     @Column(name = "ENABLED", nullable = false)
-    private Integer enabled = 1;
+    private boolean enabled = true;
 
-
-    @Column(name = "created_at")
+    @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
-    
-    
 
-    public Long getId() {
+    public void addRole(Role role) {
+        this.roles.add(role);
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+	public Long getId() {
 		return id;
 	}
 
@@ -130,11 +142,11 @@ public class User {
 		this.roles = roles;
 	}
 
-	public Integer getEnabled() {
+	public boolean isEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(Integer enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
@@ -153,25 +165,6 @@ public class User {
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
 	}
-
-	@PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
     
-    public String getFullName() {
-        return firstName + " " + lastName;
-    }
-
     
-    public boolean hasRole(String roleName) {
-        return roles.stream()
-                .anyMatch(role -> role.getName().name().equals(roleName));
-    }
 }

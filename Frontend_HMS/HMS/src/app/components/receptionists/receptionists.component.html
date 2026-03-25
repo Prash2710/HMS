@@ -1,0 +1,123 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Receptionists</h1>
+      <p class="page-subtitle">Manage hospital reception staff</p>
+    </div>
+    <button class="btn btn-gold" (click)="openAdd()">＋ Add Receptionist</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input class="form-control" [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="Search by name, email, shift…">
+    </div>
+    <span class="count-badge">{{ filtered.length }} receptionist{{ filtered.length !== 1 ? 's' : '' }}</span>
+  </div>
+
+  <div class="card">
+    <div *ngIf="loading" class="loading-state"><div class="spinner"></div><span>Loading…</span></div>
+    <div *ngIf="!loading && filtered.length === 0" class="empty-state">
+      <div class="empty-icon">🗂️</div>
+      <p>No receptionists found. <button class="link-btn" (click)="openAdd()">Add one</button></p>
+    </div>
+    <div class="table-wrap" *ngIf="!loading && filtered.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr><th>Receptionist</th><th>Phone</th><th>Shift</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of filtered">
+            <td>
+              <div class="doc-cell">
+                <div class="avatar">{{ initials(r) }}</div>
+                <div>
+                  <div class="fw-600">{{ r.firstName }} {{ r.lastName }}</div>
+                  <div class="text-muted text-xs">{{ r.email }}</div>
+                </div>
+              </div>
+            </td>
+            <td>{{ r.phone || '—' }}</td>
+            <td><span class="badge" [ngClass]="shiftClass(r.shift)">{{ r.shift }}</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-outline btn-sm" (click)="openEdit(r)">Edit</button>
+                <button class="btn btn-danger-outline btn-sm" (click)="confirmDelete(r.id)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="showModal=false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ editMode ? 'Edit Receptionist' : 'Add Receptionist' }}</h3>
+      <button class="btn-icon" (click)="showModal=false">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name *</label>
+          <input class="form-control" [(ngModel)]="form.firstName" placeholder="First name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name *</label>
+          <input class="form-control" [(ngModel)]="form.lastName" placeholder="Last name">
+        </div>
+      </div>
+      <div class="form-row" *ngIf="!editMode">
+        <div class="form-group">
+          <label class="form-label">Username *</label>
+          <input class="form-control" [(ngModel)]="form.username" placeholder="Login username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <input type="password" class="form-control" [(ngModel)]="form.password" placeholder="Password">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input type="email" class="form-control" [(ngModel)]="form.email" placeholder="Email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input class="form-control" [(ngModel)]="form.phone" placeholder="Phone number">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Shift *</label>
+        <select class="form-control" [(ngModel)]="form.shift">
+          <option *ngFor="let s of shifts" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="showModal=false">Cancel</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="saving">
+        <span *ngIf="saving" class="spinner"></span>
+        {{ saving ? 'Saving…' : (editMode ? 'Update' : 'Create') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="showDeleteConfirm=false">
+  <div class="modal confirm-modal" (click)="$event.stopPropagation()">
+    <div class="modal-body confirm-body">
+      <div class="confirm-icon">⚠️</div>
+      <h3>Delete Receptionist?</h3>
+      <p>This cannot be undone. The user account will also be removed.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="showDeleteConfirm=false">Cancel</button>
+      <button class="btn btn-danger-outline" (click)="doDelete()">Yes, Delete</button>
+    </div>
+  </div>
+</div>

@@ -1,66 +1,116 @@
 package com.example.hms.entity;
 
 import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "DOCTORS")
+@Table(
+    name = "DOCTORS",
+    indexes = {
+        @Index(name = "idx_doctor_specialization", columnList = "SPECIALIZATION"),
+        @Index(name = "idx_doctor_status", columnList = "STATUS")
+    }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Doctor {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doctor_seq")
-	@SequenceGenerator(
-		    name = "doctor_seq",
-		    sequenceName = "DOCTOR_SEQ",
-		    allocationSize = 1
-		)
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doctor_seq")
+    @SequenceGenerator(
+            name = "doctor_seq",
+            sequenceName = "DOCTOR_SEQ",
+            allocationSize = 1
+    )
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    // 🔥 FIX 1: column name uppercase (VERY IMPORTANT)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID", nullable = false)
     private User user;
 
-    @Column(nullable = false)
+    @Column(name = "SPECIALIZATION", nullable = false)
     private String specialization;
 
-    @Column(nullable = false)
+    @Column(name = "QUALIFICATION", nullable = false)
     private String qualification;
 
+    @Column(name = "EXPERIENCE")
     private Integer experience;
 
-    @Column(length = 500)
+    @Column(name = "ABOUT", length = 500)
     private String about;
 
+    @Column(name = "LICENSE_NUMBER", unique = true)
     private String licenseNumber;
 
-    @Column(nullable = false)
+    @Column(name = "CONSULTATION_FEE", nullable = false)
     private Double consultationFee;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS")
     private Status status = Status.AVAILABLE;
 
-    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
+    // 🔥 FIX 2: LAZY to avoid pagination crash
+    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Appointment> appointments = new ArrayList<>();
 
-    @Column(name = "created_at")
+    @Column(name = "CREATED_AT", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
-    
-    
 
-    public Long getId() {
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    // ✅ Utility methods
+
+    public String getExperienceLevel() {
+        int exp = experience != null ? experience : 0;
+
+        if (exp < 2) return "Junior";
+        if (exp < 5) return "Mid-level";
+        if (exp < 10) return "Senior";
+
+        return "Expert";
+    }
+
+    public boolean isAvailable() {
+        return status == Status.AVAILABLE;
+    }
+
+    public enum Status {
+        AVAILABLE("Available"),
+        UNAVAILABLE("Unavailable"),
+        ON_LEAVE("On Leave");
+
+        private final String displayName;
+
+        Status(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+
+	public Long getId() {
 		return id;
 	}
 
@@ -155,50 +205,6 @@ public class Doctor {
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
 	}
-
-	@PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
     
-    public String getExperienceLevel() {
-        int exp = experience != null ? experience : 0;
-
-        if (exp < 2) {
-            return "Junior";
-        } else if (exp < 5) {
-            return "Mid-level";
-        } else if (exp < 10) {
-            return "Senior";
-        } else {
-            return "Expert";
-        }
-    }
-
     
-    public boolean isAvailable() {
-        return status == Status.AVAILABLE;
-    }
-
-    public enum Status {
-        AVAILABLE("Available"),
-        UNAVAILABLE("Unavailable"),
-        ON_LEAVE("On Leave");
-        
-        private final String displayName;
-        
-        Status(String displayName) {
-            this.displayName = displayName;
-        }
-        
-        public String getDisplayName() {
-            return displayName;
-        }
-    }
 }

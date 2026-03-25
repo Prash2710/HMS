@@ -1,0 +1,63 @@
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <h2>Appointments</h2>
+
+    <button class="book-btn" (click)="toggleBooking()">
+      ➕ Book Appointment
+    </button>
+  </div>
+
+  <!-- Booking Section -->
+  <div *ngIf="showBooking" class="booking-box">
+    <h3>Book Appointment (Coming Soon)</h3>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    Loading appointments...
+  </div>
+
+  <!-- Table -->
+  <table *ngIf="!loading">
+
+    <thead>
+      <tr>
+        <th>Patient</th>
+        <th>Doctor</th>
+        <th>Date</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      <tr *ngFor="let a of appointments">
+
+        <td>{{ a.patientName }}</td>
+        <td>{{ a.doctorName }}</td>
+        <td>{{ a.appointmentDateTime | date:'medium' }}</td>
+
+        <td>
+          <span class="badge"
+                [ngClass]="{
+                  'green': a.status === 'CONFIRMED',
+                  'blue': a.status === 'SCHEDULED',
+                  'red': a.status === 'CANCELLED'
+                }">
+            {{ a.status }}
+          </span>
+        </td>
+
+      </tr>
+
+      <tr *ngIf="appointments.length === 0">
+        <td colspan="4" class="empty">No appointments found</td>
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>

@@ -1,84 +1,69 @@
 <div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <div class="logo">🏥</div>
-      <h1>Hospital Management System</h1>
-      <h2>Welcome Back</h2>
+
+  <!-- Left Side -->
+  <div class="left-panel">
+    <div class="brand">
+      🏥 HMS
     </div>
 
-    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input 
-          type="text" 
-          id="username" 
-          name="username" 
-          [value]="loginData().username"
-          (input)="updateUsername($any($event.target).value)"
-          required
-          class="form-control"
-          placeholder="Enter your username"
-          [disabled]="loading()"
-        />
+    <h1>Welcome Back</h1>
+    <p>Manage your hospital operations efficiently</p>
+
+    <ul class="features">
+      <li>✔ Doctor & Patient Management</li>
+      <li>✔ Appointment Scheduling</li>
+      <li>✔ Medical Records</li>
+      <li>✔ Role-based Access</li>
+    </ul>
+  </div>
+
+  <!-- Right Side -->
+  <div class="right-panel">
+
+    <div class="login-card">
+      <h2>Login</h2>
+
+      <form (ngSubmit)="onSubmit()">
+
+        <div class="form-group">
+          <label>Username</label>
+          <input
+            type="text"
+            [(ngModel)]="username"
+            name="username"
+            placeholder="Enter username"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="password-box">
+            <input
+              [type]="showPwd ? 'text' : 'password'"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Enter password"
+              required
+            />
+            <span (click)="showPwd = !showPwd" class="eye">
+              {{ showPwd ? '🙈' : '👁️' }}
+            </span>
+          </div>
+        </div>
+
+        <button class="login-btn" type="submit" [disabled]="loading">
+          <span *ngIf="!loading">Login</span>
+          <span *ngIf="loading">Logging in...</span>
+        </button>
+
+      </form>
+
+      <div class="hint">
+        Default: <strong>admin / admin123</strong>
       </div>
 
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input 
-          type="password" 
-          id="password" 
-          name="password" 
-          [value]="loginData().password"
-          (input)="updatePassword($any($event.target).value)"
-          required
-          class="form-control"
-          placeholder="Enter your password"
-          [disabled]="loading()"
-        />
-      </div>
-
-      @if (errorMessage()) {
-        <div class="error-message">
-          <span class="error-icon">⚠️</span>
-          {{ errorMessage() }}
-        </div>
-      }
-
-      <button 
-        type="submit" 
-        class="btn btn-primary" 
-        [disabled]="!loginForm.valid || loading()"
-      >
-        @if (loading()) {
-          <span class="spinner"></span>
-          Logging in...
-        } @else {
-          Login
-        }
-      </button>
-    </form>
-
-    <div class="divider">
-      <span>OR</span>
     </div>
 
-    <div class="register-link">
-      <p>Don't have an account? <a routerLink="/register">Register here</a></p>
-    </div>
-
-    <div class="demo-credentials">
-      <p class="demo-title">Demo Credentials:</p>
-      <div class="demo-grid">
-        <div class="demo-item">
-          <strong>Admin:</strong> admin / admin123
-        </div>
-        <div class="demo-item">
-          <strong>Doctor:</strong> doctor1 / doctor123
-        </div>
-        <div class="demo-item">
-          <strong>Patient:</strong> patient1 / patient123
-        </div>
-      </div>
-    </div>
   </div>
 </div>

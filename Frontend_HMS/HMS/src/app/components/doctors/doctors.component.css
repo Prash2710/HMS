@@ -1,0 +1,116 @@
+.dashboard {
+  padding: 25px;
+  background: #f1f5f9;
+  min-height: 100vh;
+  font-family: 'Segoe UI';
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.logout-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.card {
+  flex: 1;
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+}
+
+.card p {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.blue { background: #3b82f6; }
+.green { background: #16a34a; }
+
+/* Table */
+.table-wrapper {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #e2e8f0;
+  padding: 12px;
+}
+
+td {
+  padding: 12px;
+  border-top: 1px solid #eee;
+}
+
+/* Patient */
+.patient {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.avatar {
+  width: 35px;
+  height: 35px;
+  background: #4f46e5;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Status */
+.badge {
+  padding: 5px 10px;
+  border-radius: 10px;
+  color: white;
+}
+
+.green { background: #16a34a; }
+.blue { background: #3b82f6; }
+.red { background: #ef4444; }
+
+/* Button */
+.btn {
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Empty */
+.empty {
+  text-align: center;
+  padding: 20px;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+}

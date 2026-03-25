@@ -39,7 +39,11 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         
-        
+        <dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-ui</artifactId>
+    <version>1.7.0</version>
+</dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -73,10 +77,10 @@
 </dependency>
 
 <!--Reddis Dependency-->
-<dependency>
+<!--<dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-redis</artifactId>
-</dependency>
+</dependency>-->
 
 <dependency>
     <groupId>org.springframework.boot</groupId>

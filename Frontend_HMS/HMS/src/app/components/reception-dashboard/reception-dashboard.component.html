@@ -1,0 +1,57 @@
+<div class="dashboard">
+
+  <!-- Header -->
+  <div class="header">
+    <h2>Reception Dashboard</h2>
+
+    <button class="logout-btn" (click)="logout()">
+      🚪 Logout
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+
+    <div class="card blue">
+      <div class="title">Patients</div>
+      <div class="value">{{ patientCount }}</div>
+    </div>
+
+    <div class="card green">
+      <div class="title">Total Appointments</div>
+      <div class="value">{{ appointmentCount }}</div>
+    </div>
+
+    <div class="card orange">
+      <div class="title">Today's Appointments</div>
+      <div class="value">{{ todayAppointments }}</div>
+    </div>
+
+    <div class="card purple">
+      <div class="title">Upcoming</div>
+      <div class="value">{{ upcomingAppointments }}</div>
+    </div>
+
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+
+    <div class="action-card" routerLink="/patients">
+      <h3>🧑 Manage Patients</h3>
+      <p>Register, update and manage patients</p>
+    </div>
+
+    <div class="action-card" routerLink="/appointments">
+      <h3>📅 Appointments</h3>
+      <p>Book and manage appointments</p>
+    </div>
+
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    Loading dashboard...
+  </div>
+
+</div>

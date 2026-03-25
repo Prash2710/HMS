@@ -1,0 +1,82 @@
+<div class="dashboard">
+
+  <div class="header">
+    <h2>Doctor Dashboard</h2>
+    <button class="logout-btn" (click)="logout()">🚪 Logout</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="card blue">
+      <h3>Total Appointments</h3>
+      <p>{{ totalAppointments }}</p>
+    </div>
+
+    <div class="card green">
+      <h3>Today's Patients</h3>
+      <p>{{ todayAppointments }}</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    Loading...
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading" class="table-wrapper">
+
+    <table>
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Medical</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr *ngFor="let a of appointments">
+
+          <td>
+            <div class="patient">
+              <div class="avatar">
+                {{ a.patientName.charAt(0) }}
+              </div>
+              <div>
+                <div class="name">{{ a.patientName }}</div>
+              </div>
+            </div>
+          </td>
+
+          <td>{{ a.appointmentDateTime | date:'medium' }}</td>
+
+          <td>
+            <span class="badge"
+              [ngClass]="{
+                'green': a.status === 'CONFIRMED',
+                'blue': a.status === 'SCHEDULED',
+                'red': a.status === 'CANCELLED'
+              }">
+              {{ a.status }}
+            </span>
+          </td>
+
+          <td>
+            <button class="btn">📋 Records</button>
+          </td>
+
+        </tr>
+
+        <tr *ngIf="appointments.length === 0">
+          <td colspan="4" class="empty">No appointments</td>
+        </tr>
+
+      </tbody>
+    </table>
+
+  </div>
+
+</div>

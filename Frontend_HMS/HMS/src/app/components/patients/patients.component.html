@@ -1,0 +1,82 @@
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <h2>Patients</h2>
+
+    <input
+      type="text"
+      placeholder="Search patients..."
+      [(ngModel)]="search"
+      (input)="applyFilter()"
+      class="search"
+    />
+
+    <!-- 🔥 Only for receptionist -->
+    <button *ngIf="!isAdmin" class="add-btn">
+      ➕ Add Patient
+    </button>
+  </div>
+
+  <!-- Admin Info -->
+  <div *ngIf="isAdmin" class="info">
+    🔒 Admin has read-only access
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    Loading patients...
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading" class="table-wrapper">
+
+    <table>
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Blood Group</th>
+          <th *ngIf="!isAdmin">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr *ngFor="let p of filtered">
+
+          <!-- Patient -->
+          <td class="user-cell">
+            <div class="avatar">{{ getInitials(p) }}</div>
+            <div>
+              <div class="name">{{ p.firstName }} {{ p.lastName }}</div>
+            </div>
+          </td>
+
+          <td>{{ p.email }}</td>
+          <td>{{ p.phone }}</td>
+
+          <td>
+            <span class="badge">{{ p.bloodGroup || 'N/A' }}</span>
+          </td>
+
+          <!-- 🔥 Actions only for receptionist -->
+          <td *ngIf="!isAdmin">
+            <button class="edit" (click)="edit(p)">Edit</button>
+            <button class="delete" (click)="delete(p)">Delete</button>
+          </td>
+
+        </tr>
+
+        <!-- Empty -->
+        <tr *ngIf="filtered.length === 0">
+          <td colspan="5" class="empty">No patients found</td>
+        </tr>
+
+      </tbody>
+    </table>
+
+  </div>
+
+</div>

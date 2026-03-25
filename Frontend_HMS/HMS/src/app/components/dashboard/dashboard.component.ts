@@ -1,83 +1,55 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { DoctorService } from '../../services/doctor-service.service';
+import { ReceptionService } from '../../services/reception-service.service';
 import { AuthService } from '../../services/auth.service';
-import { DoctorService, AppointmentService } from '../../services/api.service';
-import { Doctor, Appointment } from '../../models';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterOutlet],
+  imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  private authService = inject(AuthService);
+
+  private auth = inject(AuthService);
   private doctorService = inject(DoctorService);
-  private appointmentService = inject(AppointmentService);
-  private router = inject(Router);
+  private receptionService = inject(ReceptionService);
 
-  // Signals
-  doctors = signal<Doctor[]>([]);
-  appointments = signal<Appointment[]>([]);
-  loading = signal(true);
+  doctorCount = 0;
+  patientCount = 0;
+  receptionistCount = 0;
 
-  // Computed values
-  currentUser = this.authService.currentUser;
-  isAdmin = this.authService.isAdmin;
-  isDoctor = this.authService.isDoctor;
-  isPatient = this.authService.isPatient;
+  todayEarnings = 0;
+  monthEarnings = 0;
 
-  availableDoctorsCount = computed(() => 
-    this.doctors().filter(d => d.status === 'AVAILABLE').length
-  );
-
-  upcomingAppointmentsCount = computed(() =>
-    this.appointments().filter(a => 
-      a.status === 'SCHEDULED' || a.status === 'CONFIRMED'
-    ).length
-  );
+  loading = true;
 
   ngOnInit(): void {
-    this.loadDashboardData();
-  }
 
-  private loadDashboardData(): void {
-    this.loading.set(true);
-
-    // Load doctors
-    this.doctorService.getAllDoctors().subscribe({
-      next: (data) => {
-        this.doctors.set(data.slice(0, 6));
-      },
-      error: (error) => console.error('Error loading doctors', error)
+    // Doctors count
+    this.doctorService.getAll(0, 1).subscribe({
+      next: res => this.doctorCount = res.data?.totalElements ?? 0
     });
 
-    // Load appointments
-    this.appointmentService.getAllAppointments().subscribe({
-      next: (data) => {
-        this.appointments.set(data.slice(0, 5));
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading appointments', error);
-        this.loading.set(false);
-      }
+    // Patients count
+    this.receptionService.getPatients(0, 1).subscribe({
+      next: res => this.patientCount = res.data?.totalElements ?? 0
     });
+
+    // Dummy receptionist count (until API available)
+    this.receptionistCount = 5;
+
+    // Dummy earnings (replace later with API)
+    this.todayEarnings = 12500;
+    this.monthEarnings = 320000;
+
+    this.loading = false;
   }
 
   logout(): void {
-    this.authService.logout();
-  }
-
-  navigateToBooking(doctorId: number): void {
-    this.router.navigate(['/patient/book-appointment'], { 
-      queryParams: { doctorId } 
-    });
-  }
-
-  getStatusClass(status: string): string {
-    return status.toLowerCase().replace('_', '-');
-  }
+  this.auth.logout();
+}
 }

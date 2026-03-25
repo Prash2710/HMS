@@ -10,7 +10,8 @@ import com.example.hms.entity.MedicalRecord;
 
 @Repository
 public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, Long> {
-    List<MedicalRecord> findByPatientId(Long patientId);
+//    List<MedicalRecord> findByPatientId(Long patientId);
     List<MedicalRecord> findByDoctorId(Long doctorId);
     Optional<MedicalRecord>findByAppointmentId(Long appointmentId);
+    List<MedicalRecord> findByPatientId(Long patientId);
 }
